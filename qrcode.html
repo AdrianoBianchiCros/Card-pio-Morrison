@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR Code do Cardápio | Morrison</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Rye&family=Oswald:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ink:#120f0c; --paper:#efe3c8; --accent:#a8741c; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#2a241d; font-family:"Oswald",sans-serif; color:var(--ink);
+           display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px 16px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+    .actions button, .actions a { font:inherit; padding:10px 18px; border-radius:999px; border:0; cursor:pointer;
+           background:var(--paper); color:var(--ink); text-decoration:none; letter-spacing:.06em; text-transform:uppercase; font-size:.85rem; }
+    .sheet { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); max-width:640px; gap:16px; width:100%; }
+    .card { background:var(--paper); border:6px double var(--ink); border-radius:8px; padding:22px 18px; text-align:center; }
+    .tag { margin:0; text-transform:uppercase; letter-spacing:.2em; font-size:.7rem; }
+    .name { font-family:"Rye",serif; font-size:2.6rem; line-height:1; margin:8px 0 2px; }
+    .since { letter-spacing:.3em; font-size:.75rem; color:var(--accent); font-weight:600; }
+    .qr { width:78%; max-width:240px; margin:14px auto 8px; display:block; background:#fff; padding:8px; border-radius:6px; }
+    .cta { font-size:1.2rem; font-weight:600; text-transform:uppercase; letter-spacing:.08em; margin:6px 0 2px; }
+    .url { font-size:.72rem; word-break:break-all; opacity:.75; margin:0; }
+    @media print {
+      body { background:#fff; padding:0; }
+      .actions { display:none; }
+      .sheet { gap:10mm; }
+      .card { break-inside:avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="actions">
+    <button type="button" onclick="window.print()">Imprimir</button>
+    <a href="assets/qrcode.png" download="morrison-cardapio-qrcode.png">Baixar QR (PNG)</a>
+    <a href="assets/qrcode.svg" download="morrison-cardapio-qrcode.svg">Baixar QR (SVG)</a>
+    <a href="./">Ver cardápio</a>
+  </div>
+  <div class="sheet" id="sheet"></div>
+  <template id="tpl">
+    <div class="card">
+      <p class="tag">Rock não é ocasião · É estilo de vida</p>
+      <div class="name">Morrison</div>
+      <div class="since">DESDE 1994 · BAR &amp; ROCK'N'ROLL</div>
+      <img class="qr" src="assets/qrcode.svg" alt="QR Code para abrir o cardápio digital do Morrison">
+      <p class="cta">Aponte a câmera e confira o cardápio</p>
+      <p class="url">adrianobianchicros.github.io/Card-pio-Morrison</p>
+    </div>
+  </template>
+  <script>
+    var tpl = document.getElementById("tpl"), sheet = document.getElementById("sheet");
+    for (var i = 0; i < 4; i++) sheet.appendChild(tpl.content.cloneNode(true));
+  </script>
+</body>
+</html>
