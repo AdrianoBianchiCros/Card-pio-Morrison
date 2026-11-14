@@ -7,17 +7,17 @@
 </p>
 
 <p align="center">
-  <b>Link:</b> <a href="https://adrianobianchicros.github.io/Card-pio-Morrison/">adrianobianchicros.github.io/Card-pio-Morrison</a><br>
-  Baixar: <a href="https://github.com/AdrianoBianchiCros/Card-pio-Morrison/raw/claude/morridos-rock-bar-menu-gunxdf/assets/qrcode.png">PNG</a> ·
-  <a href="https://github.com/AdrianoBianchiCros/Card-pio-Morrison/raw/claude/morridos-rock-bar-menu-gunxdf/assets/qrcode.svg">SVG (para gráfica)</a> ·
-  Cartões para imprimir: <a href="https://adrianobianchicros.github.io/Card-pio-Morrison/qrcode.html">qrcode.html</a>
+  <b>Link:</b> <a href="https://card-pio-morrison.adrianobianhi-a28.workers.dev/">card-pio-morrison.adrianobianhi-a28.workers.dev</a><br>
+  Baixar: <a href="https://github.com/AdrianoBianchiCros/Card-pio-Morrison/raw/main/assets/qrcode.png">PNG</a> ·
+  <a href="https://github.com/AdrianoBianchiCros/Card-pio-Morrison/raw/main/assets/qrcode.svg">SVG (para gráfica)</a> ·
+  Cartões para imprimir: <a href="https://card-pio-morrison.adrianobianhi-a28.workers.dev/qrcode.html">qrcode.html</a>
 </p>
 
-> ⚠️ O QR Code só abre o cardápio depois de ativar o GitHub Pages (passo a passo em **Publicar** abaixo).
+> Publicado na Cloudflare, conectado à branch `main`: toda alteração enviada ao GitHub atualiza o site automaticamente.
 
 Cardápio digital (HTML + CSS + JS puro, sem dependências) para ser acessado via QR Code.
 
-**Endereço (após ativar o GitHub Pages):** https://adrianobianchicros.github.io/Card-pio-Morrison/
+**Endereço:** https://card-pio-morrison.adrianobianhi-a28.workers.dev/
 
 ## Estrutura
 
@@ -35,11 +35,10 @@ Cardápio digital (HTML + CSS + JS puro, sem dependências) para ser acessado vi
 Abra `js/menu-data.js` e altere o valor de `price` (use ponto: `16.5` = R$ 16,50).
 Para remover um item, apague a linha dele. Ao salvar e publicar, o QR Code continua o mesmo.
 
-## Publicar (GitHub Pages)
+## Publicação
 
-1. No GitHub: **Settings → Pages**.
-2. Em *Source*, escolha **Deploy from a branch**, selecione a branch `claude/morridos-rock-bar-menu-gunxdf` e a pasta `/ (root)`.
-3. Aguarde ~1 minuto; o site ficará em `https://adrianobianchicros.github.io/Card-pio-Morrison/`.
+O site está hospedado na **Cloudflare**, conectado a este repositório (branch `main`).
+Qualquer alteração enviada para a `main` é publicada automaticamente em cerca de 1 minuto. O QR Code não muda.
 
 > Se usar outro domínio (ex.: `cardapio.morrisonbar.com.br`), gere um novo QR Code com:
 > `pip install qrcode && python3 -c "import qrcode; qrcode.make('SUA_URL').save('assets/qrcode.png')"`
