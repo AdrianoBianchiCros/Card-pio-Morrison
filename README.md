@@ -1,5 +1,20 @@
 # Cardápio Digital — Morrison Bar & Rock'n'Roll
 
+## QR Code do cardápio
+
+<p align="center">
+  <img src="assets/qrcode.png" alt="QR Code do cardápio Morrison" width="280">
+</p>
+
+<p align="center">
+  <b>Link:</b> <a href="https://adrianobianchicros.github.io/Card-pio-Morrison/">adrianobianchicros.github.io/Card-pio-Morrison</a><br>
+  Baixar: <a href="https://github.com/AdrianoBianchiCros/Card-pio-Morrison/raw/claude/morridos-rock-bar-menu-gunxdf/assets/qrcode.png">PNG</a> ·
+  <a href="https://github.com/AdrianoBianchiCros/Card-pio-Morrison/raw/claude/morridos-rock-bar-menu-gunxdf/assets/qrcode.svg">SVG (para gráfica)</a> ·
+  Cartões para imprimir: <a href="https://adrianobianchicros.github.io/Card-pio-Morrison/qrcode.html">qrcode.html</a>
+</p>
+
+> ⚠️ O QR Code só abre o cardápio depois de ativar o GitHub Pages (passo a passo em **Publicar** abaixo).
+
 Cardápio digital (HTML + CSS + JS puro, sem dependências) para ser acessado via QR Code.
 
 **Endereço (após ativar o GitHub Pages):** https://adrianobianchicros.github.io/Card-pio-Morrison/
@@ -23,7 +38,7 @@ Para remover um item, apague a linha dele. Ao salvar e publicar, o QR Code conti
 ## Publicar (GitHub Pages)
 
 1. No GitHub: **Settings → Pages**.
-2. Em *Source*, escolha **Deploy from a branch**, selecione a branch (ex.: `main`) e a pasta `/ (root)`.
+2. Em *Source*, escolha **Deploy from a branch**, selecione a branch `claude/morridos-rock-bar-menu-gunxdf` e a pasta `/ (root)`.
 3. Aguarde ~1 minuto; o site ficará em `https://adrianobianchicros.github.io/Card-pio-Morrison/`.
 
 > Se usar outro domínio (ex.: `cardapio.morrisonbar.com.br`), gere um novo QR Code com:
