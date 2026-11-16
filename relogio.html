@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relógio Analógico</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #1e1f24;
+    color: #f2f2f2;
+    padding: 16px;
+  }
+
+  .relogio {
+    position: relative;
+    width: min(320px, 85vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #fafafa;
+    border: 10px solid #333;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5), inset 0 0 12px rgba(0,0,0,.15);
+  }
+
+  /* Marcas dos minutos/horas */
+  .marca {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 2px;
+    height: 50%;
+    margin-left: -1px;
+    transform-origin: bottom center;
+  }
+  .marca::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: #999;
+  }
+  .marca.hora { width: 4px; margin-left: -2px; }
+  .marca.hora::before { height: 14px; background: #222; }
+
+  .numero {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    text-align: center;
+    line-height: 30px;
+    font-size: clamp(14px, 5vw, 20px);
+    font-weight: 700;
+    color: #222;
+  }
+
+  /* Ponteiros */
+  .ponteiro {
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform-origin: bottom center;
+    border-radius: 4px;
+    transition: transform 0.8s cubic-bezier(.4, 1.6, .5, 1);
+  }
+  .ponteiro.hora    { width: 8px; height: 26%; margin-left: -4px; background: #222; }
+  .ponteiro.minuto  { width: 5px; height: 38%; margin-left: -2.5px; background: #444; }
+
+  .centro {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 16px;
+    height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    background: #d62828;
+    border: 3px solid #222;
+    z-index: 5;
+  }
+
+  .controles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+  .controles input {
+    font-size: 22px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 2px solid #555;
+    background: #2b2d33;
+    color: #fff;
+    width: 170px;
+    text-align: center;
+  }
+  .controles input.erro { border-color: #d62828; }
+  .controles button {
+    font-size: 16px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    background: #3a86ff;
+    color: #fff;
+    cursor: pointer;
+  }
+  .controles button.secundario { background: #555; }
+  .controles button:hover { filter: brightness(1.1); }
+
+  .linha-digital { display: flex; align-items: center; gap: 12px; }
+  .digital { font-size: 28px; letter-spacing: 2px; font-variant-numeric: tabular-nums; min-width: 100px; text-align: center; }
+  .olho {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: #aaa;
+    display: flex;
+    border-radius: 8px;
+  }
+  .olho:hover { color: #fff; background: #2b2d33; }
+  .olho svg { width: 26px; height: 26px; }
+  .ajuda { font-size: 13px; color: #aaa; margin-top: -20px; }
+</style>
+</head>
+<body>
+
+  <div class="relogio" id="relogio">
+    <div class="ponteiro hora" id="pHora"></div>
+    <div class="ponteiro minuto" id="pMinuto"></div>
+    <div class="centro"></div>
+  </div>
+
+  <div class="linha-digital">
+    <div class="digital" id="digital">••:••</div>
+    <button class="olho" id="btnOlho" type="button" aria-label="Mostrar hora" title="Mostrar hora"></button>
+  </div>
+
+  <div class="controles">
+    <input type="text" id="entrada" placeholder="HHMM" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+    <button id="btnAjustar">Ajustar</button>
+    <button id="btnAgora" class="secundario">Hora atual</button>
+  </div>
+  <div class="ajuda">Digite só números, horas e minutos (ex.: 1545 = 15:45, 930 = 09:30) e pressione Enter</div>
+
+<script>
+  const relogio  = document.getElementById('relogio');
+  const pHora    = document.getElementById('pHora');
+  const pMinuto  = document.getElementById('pMinuto');
+  const digital  = document.getElementById('digital');
+  const entrada  = document.getElementById('entrada');
+
+  // ---- Monta marcas e números do mostrador ----
+  for (let i = 0; i < 60; i++) {
+    const m = document.createElement('div');
+    m.className = 'marca' + (i % 5 === 0 ? ' hora' : '');
+    m.style.transform = `rotate(${i * 6}deg)`;
+    relogio.appendChild(m);
+  }
+  for (let n = 1; n <= 12; n++) {
+    const el = document.createElement('div');
+    el.className = 'numero';
+    el.textContent = n;
+    const ang = n * 30 * Math.PI / 180;
+    el.style.left = (50 + 38 * Math.sin(ang)) + '%';
+    el.style.top  = (50 - 38 * Math.cos(ang)) + '%';
+    relogio.appendChild(el);
+  }
+
+  // Guarda o ângulo atual de cada ponteiro para girar sempre pelo caminho
+  // mais curto (evita o ponteiro dar uma volta inteira ao contrário).
+  const angulos = { hora: 0, minuto: 0 };
+
+  function girar(el, chave, alvo) {
+    const atual = angulos[chave];
+    let diff = ((alvo - atual) % 360 + 540) % 360 - 180; // entre -180 e 180
+    angulos[chave] = atual + diff;
+    el.style.transform = `rotate(${angulos[chave]}deg)`;
+  }
+
+  function ajustarPonteiros(h, m) {
+    const angMin  = m * 6;
+    const angHora = (h % 12) * 30 + m * 0.5;
+
+    girar(pHora, 'hora', angHora);
+    girar(pMinuto, 'minuto', angMin);
+
+    const pad = v => String(v).padStart(2, '0');
+    horaTexto = `${pad(h)}:${pad(m)}`;
+    atualizarDigital();
+  }
+
+  // ---- Olhinho: mostra/oculta a hora digital (começa oculta) ----
+  const btnOlho = document.getElementById('btnOlho');
+  const ICONE_ABERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const ICONE_FECHADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+  let horaTexto = '12:00';
+  let horaVisivel = false;
+
+  function atualizarDigital() {
+    digital.textContent = horaVisivel ? horaTexto : '••:••';
+    btnOlho.innerHTML = horaVisivel ? ICONE_ABERTO : ICONE_FECHADO;
+    const rotulo = horaVisivel ? 'Ocultar hora' : 'Mostrar hora';
+    btnOlho.setAttribute('aria-label', rotulo);
+    btnOlho.title = rotulo;
+  }
+
+  btnOlho.addEventListener('click', () => {
+    horaVisivel = !horaVisivel;
+    atualizarDigital();
+  });
+
+  // Só números, horas e minutos: "9" = 09:00, "930" = 09:30, "1545" = 15:45
+  function lerHorario(texto) {
+    if (!/^\d{1,4}$/.test(texto)) return null;
+    let h, m = 0;
+    if (texto.length <= 2) {
+      h = Number(texto);
+    } else {
+      h = Number(texto.slice(0, -2));
+      m = Number(texto.slice(-2));
+    }
+    if (h > 23 || m > 59) return null;
+    return { h, m };
+  }
+
+  function aplicarEntrada() {
+    const t = lerHorario(entrada.value);
+    if (!t) {
+      entrada.classList.add('erro');
+      return;
+    }
+    entrada.classList.remove('erro');
+    ajustarPonteiros(t.h, t.m);
+    entrada.value = ''; // limpa o campo; a hora fica só no analógico e no digital
+    entrada.focus();
+  }
+
+  // Aceita só números: qualquer outro caractere é removido ao digitar
+  entrada.addEventListener('input', () => {
+    entrada.classList.remove('erro');
+    entrada.value = entrada.value.replace(/\D/g, '').slice(0, 4);
+  });
+  entrada.addEventListener('keydown', e => {
+    if (e.key === 'Enter') aplicarEntrada();
+  });
+  document.getElementById('btnAjustar').addEventListener('click', aplicarEntrada);
+  document.getElementById('btnAgora').addEventListener('click', () => {
+    const d = new Date();
+    entrada.value = '';
+    entrada.classList.remove('erro');
+    ajustarPonteiros(d.getHours(), d.getMinutes());
+  });
+
+  // Posição inicial: 12:00
+  ajustarPonteiros(12, 0);
+</script>
+</body>
+</html>
