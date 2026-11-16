@@ -255,6 +255,8 @@
     }
     entrada.classList.remove('erro');
     ajustarPonteiros(t.h, t.m, t.s);
+    entrada.value = ''; // limpa o campo; a hora fica só no analógico e no digital
+    entrada.focus();
   }
 
   // Atualiza enquanto digita (quando o valor for válido) e ao pressionar Enter
