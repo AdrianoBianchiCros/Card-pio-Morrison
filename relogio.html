@@ -120,7 +120,19 @@
   .controles button.secundario { background: #555; }
   .controles button:hover { filter: brightness(1.1); }
 
-  .digital { font-size: 28px; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+  .linha-digital { display: flex; align-items: center; gap: 12px; }
+  .digital { font-size: 28px; letter-spacing: 2px; font-variant-numeric: tabular-nums; min-width: 150px; text-align: center; }
+  .olho {
+    background: none;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    color: #aaa;
+    display: flex;
+    border-radius: 8px;
+  }
+  .olho:hover { color: #fff; background: #2b2d33; }
+  .olho svg { width: 26px; height: 26px; }
   .ajuda { font-size: 13px; color: #aaa; margin-top: -20px; }
 </style>
 </head>
@@ -133,7 +145,10 @@
     <div class="centro"></div>
   </div>
 
-  <div class="digital" id="digital">12:00:00</div>
+  <div class="linha-digital">
+    <div class="digital" id="digital">••:••:••</div>
+    <button class="olho" id="btnOlho" type="button" aria-label="Mostrar hora" title="Mostrar hora"></button>
+  </div>
 
   <div class="controles">
     <input type="text" id="entrada" placeholder="HH:MM:SS" maxlength="8" autocomplete="off">
@@ -188,8 +203,29 @@
     girar(pSegundo, 'segundo', angSeg);
 
     const pad = v => String(v).padStart(2, '0');
-    digital.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    horaTexto = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    atualizarDigital();
   }
+
+  // ---- Olhinho: mostra/oculta a hora digital (começa oculta) ----
+  const btnOlho = document.getElementById('btnOlho');
+  const ICONE_ABERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const ICONE_FECHADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+  let horaTexto = '12:00:00';
+  let horaVisivel = false;
+
+  function atualizarDigital() {
+    digital.textContent = horaVisivel ? horaTexto : '••:••:••';
+    btnOlho.innerHTML = horaVisivel ? ICONE_ABERTO : ICONE_FECHADO;
+    const rotulo = horaVisivel ? 'Ocultar hora' : 'Mostrar hora';
+    btnOlho.setAttribute('aria-label', rotulo);
+    btnOlho.title = rotulo;
+  }
+
+  btnOlho.addEventListener('click', () => {
+    horaVisivel = !horaVisivel;
+    atualizarDigital();
+  });
 
   // Aceita "H", "HH:MM", "HH:MM:SS", "HHMM", "HHMMSS" etc.
   function lerHorario(texto) {
