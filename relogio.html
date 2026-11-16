@@ -75,7 +75,6 @@
   }
   .ponteiro.hora    { width: 8px; height: 26%; margin-left: -4px; background: #222; }
   .ponteiro.minuto  { width: 5px; height: 38%; margin-left: -2.5px; background: #444; }
-  .ponteiro.segundo { width: 2px; height: 42%; margin-left: -1px; background: #d62828; }
 
   .centro {
     position: absolute;
@@ -121,7 +120,7 @@
   .controles button:hover { filter: brightness(1.1); }
 
   .linha-digital { display: flex; align-items: center; gap: 12px; }
-  .digital { font-size: 28px; letter-spacing: 2px; font-variant-numeric: tabular-nums; min-width: 150px; text-align: center; }
+  .digital { font-size: 28px; letter-spacing: 2px; font-variant-numeric: tabular-nums; min-width: 100px; text-align: center; }
   .olho {
     background: none;
     border: none;
@@ -141,27 +140,25 @@
   <div class="relogio" id="relogio">
     <div class="ponteiro hora" id="pHora"></div>
     <div class="ponteiro minuto" id="pMinuto"></div>
-    <div class="ponteiro segundo" id="pSegundo"></div>
     <div class="centro"></div>
   </div>
 
   <div class="linha-digital">
-    <div class="digital" id="digital">••:••:••</div>
+    <div class="digital" id="digital">••:••</div>
     <button class="olho" id="btnOlho" type="button" aria-label="Mostrar hora" title="Mostrar hora"></button>
   </div>
 
   <div class="controles">
-    <input type="text" id="entrada" placeholder="HH:MM:SS" maxlength="8" autocomplete="off">
+    <input type="text" id="entrada" placeholder="HHMM" maxlength="4" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
     <button id="btnAjustar">Ajustar</button>
     <button id="btnAgora" class="secundario">Hora atual</button>
   </div>
-  <div class="ajuda">Digite a hora (ex.: 3:45 ou 15:45:30) e pressione Enter</div>
+  <div class="ajuda">Digite só números, horas e minutos (ex.: 1545 = 15:45, 930 = 09:30) e pressione Enter</div>
 
 <script>
   const relogio  = document.getElementById('relogio');
   const pHora    = document.getElementById('pHora');
   const pMinuto  = document.getElementById('pMinuto');
-  const pSegundo = document.getElementById('pSegundo');
   const digital  = document.getElementById('digital');
   const entrada  = document.getElementById('entrada');
 
@@ -184,7 +181,7 @@
 
   // Guarda o ângulo atual de cada ponteiro para girar sempre pelo caminho
   // mais curto (evita o ponteiro dar uma volta inteira ao contrário).
-  const angulos = { hora: 0, minuto: 0, segundo: 0 };
+  const angulos = { hora: 0, minuto: 0 };
 
   function girar(el, chave, alvo) {
     const atual = angulos[chave];
@@ -193,17 +190,15 @@
     el.style.transform = `rotate(${angulos[chave]}deg)`;
   }
 
-  function ajustarPonteiros(h, m, s) {
-    const angSeg  = s * 6;
-    const angMin  = m * 6 + s * 0.1;
-    const angHora = (h % 12) * 30 + m * 0.5 + s * (0.5 / 60);
+  function ajustarPonteiros(h, m) {
+    const angMin  = m * 6;
+    const angHora = (h % 12) * 30 + m * 0.5;
 
     girar(pHora, 'hora', angHora);
     girar(pMinuto, 'minuto', angMin);
-    girar(pSegundo, 'segundo', angSeg);
 
     const pad = v => String(v).padStart(2, '0');
-    horaTexto = `${pad(h)}:${pad(m)}:${pad(s)}`;
+    horaTexto = `${pad(h)}:${pad(m)}`;
     atualizarDigital();
   }
 
@@ -211,11 +206,11 @@
   const btnOlho = document.getElementById('btnOlho');
   const ICONE_ABERTO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
   const ICONE_FECHADO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-  let horaTexto = '12:00:00';
+  let horaTexto = '12:00';
   let horaVisivel = false;
 
   function atualizarDigital() {
-    digital.textContent = horaVisivel ? horaTexto : '••:••:••';
+    digital.textContent = horaVisivel ? horaTexto : '••:••';
     btnOlho.innerHTML = horaVisivel ? ICONE_ABERTO : ICONE_FECHADO;
     const rotulo = horaVisivel ? 'Ocultar hora' : 'Mostrar hora';
     btnOlho.setAttribute('aria-label', rotulo);
@@ -227,24 +222,18 @@
     atualizarDigital();
   });
 
-  // Aceita "H", "HH:MM", "HH:MM:SS", "HHMM", "HHMMSS" etc.
+  // Só números, horas e minutos: "9" = 09:00, "930" = 09:30, "1545" = 15:45
   function lerHorario(texto) {
-    texto = texto.trim();
-    let partes;
-    if (texto.includes(':')) {
-      partes = texto.split(':');
-    } else if (/^\d+$/.test(texto)) {
-      if (texto.length <= 2) partes = [texto];
-      else if (texto.length <= 4) partes = [texto.slice(0, -2), texto.slice(-2)];
-      else partes = [texto.slice(0, -4), texto.slice(-4, -2), texto.slice(-2)];
+    if (!/^\d{1,4}$/.test(texto)) return null;
+    let h, m = 0;
+    if (texto.length <= 2) {
+      h = Number(texto);
     } else {
-      return null;
+      h = Number(texto.slice(0, -2));
+      m = Number(texto.slice(-2));
     }
-    if (partes.length > 3 || partes.some(p => !/^\d{1,2}$/.test(p))) return null;
-
-    const [h, m = 0, s = 0] = partes.map(Number);
-    if (h > 23 || m > 59 || s > 59) return null;
-    return { h, m, s };
+    if (h > 23 || m > 59) return null;
+    return { h, m };
   }
 
   function aplicarEntrada() {
@@ -254,16 +243,15 @@
       return;
     }
     entrada.classList.remove('erro');
-    ajustarPonteiros(t.h, t.m, t.s);
+    ajustarPonteiros(t.h, t.m);
     entrada.value = ''; // limpa o campo; a hora fica só no analógico e no digital
     entrada.focus();
   }
 
-  // Atualiza enquanto digita (quando o valor for válido) e ao pressionar Enter
+  // Aceita só números: qualquer outro caractere é removido ao digitar
   entrada.addEventListener('input', () => {
     entrada.classList.remove('erro');
-    const t = lerHorario(entrada.value);
-    if (t) ajustarPonteiros(t.h, t.m, t.s);
+    entrada.value = entrada.value.replace(/\D/g, '').slice(0, 4);
   });
   entrada.addEventListener('keydown', e => {
     if (e.key === 'Enter') aplicarEntrada();
@@ -273,11 +261,11 @@
     const d = new Date();
     entrada.value = '';
     entrada.classList.remove('erro');
-    ajustarPonteiros(d.getHours(), d.getMinutes(), d.getSeconds());
+    ajustarPonteiros(d.getHours(), d.getMinutes());
   });
 
-  // Posição inicial: 12:00:00
-  ajustarPonteiros(12, 0, 0);
+  // Posição inicial: 12:00
+  ajustarPonteiros(12, 0);
 </script>
 </body>
 </html>
